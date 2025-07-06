@@ -4,13 +4,14 @@ import useContractInstance from "../hooks/useContractInstance";
 import useCreatePrescription from "../hooks/useCreatePrescription";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { toast } from "react-toastify";
+import useDeleteMedicalRecord from "../hooks/useDeleteMedicalRecord";
 
 const DoctorPrescribe = () => {
   const { patientId } = useParams();
   const contract = useContractInstance(true);      
   const { address } = useAppKitAccount();          
   const createPrescription = useCreatePrescription();
-
+  const deleteRecord = useDeleteMedicalRecord();
   const [records, setRecords] = useState([]);
   const [inputs, setInputs] = useState({});
   const [loadingId, setLoadingId] = useState(null);
@@ -24,7 +25,7 @@ const DoctorPrescribe = () => {
     try {
       const ok = await contract.canView(Number(patientId), address);
       
-      console.log("🔍 canView →", ok);
+      console.log(" canView ", ok);
       if (!ok) {
         setUnauthorized(true);
         toast.error("⛔ You’re not authorized to view these records");
@@ -49,7 +50,6 @@ const DoctorPrescribe = () => {
     }
   }, [contract, patientId, address]);
 
-  // 🔑 Only when BOTH contract and address exist do we fetch:
   useEffect(() => {
     if (contract && address && patientId) {
       fetchRecords();
@@ -105,6 +105,7 @@ const DoctorPrescribe = () => {
               value={inputs[r.id] || ""}
               onChange={(e) => onChange(r.id, e.target.value)}
             />
+          <div className="flex justify-between items-center">
             <button
               className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
               disabled={loadingId === r.id || !inputs[r.id]?.trim()}
@@ -112,6 +113,19 @@ const DoctorPrescribe = () => {
             >
               {loadingId === r.id ? "Submitting…" : "Submit"}
             </button>
+            
+    <button
+      className="px-4 py-2 bg-red-600 text-white rounded"
+      onClick={async () => {
+        if (window.confirm("Are you sure you want to delete this record?")) {
+          await deleteRecord(r.id);
+          await fetchRecords(); // Refresh after delete
+        }
+      }}
+    >
+      Delete
+    </button>
+    </div>
           </li>
         ))}
       </ul>

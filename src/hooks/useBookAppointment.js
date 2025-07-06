@@ -1,12 +1,11 @@
 import { useCallback } from "react";
 import { toast } from "react-toastify";
-import { ethers } from "ethers";
+import { ethers,Interface } from "ethers";
 import { ErrorDecoder } from "ethers-decode-error";
 import { celoAlfajores } from "@reown/appkit/networks";
-
+import ABI from "../ABI/Healthcare.json";
 import useContractInstance from "./useContractInstance";
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
-// import { ethers } from "ethers";
 
 
 
@@ -14,12 +13,7 @@ const useBookAppointment = () => {
   const contract = useContractInstance(true);
   const { address } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
-
-  // const checksummed = ethers.getAddress(address);
-  // const patientId = await contract.patientIds(checksummed);
-
-
-  return useCallback(async (doctorAddress, timestamp, fee) => {
+return useCallback(async (doctorAddress, timestamp, fee) => {
     if (!doctorAddress || !timestamp || !fee) {
       toast.error("All fields are required");
       return;
@@ -48,25 +42,18 @@ const useBookAppointment = () => {
       timestamp,
       msgValue: Number(fee),
     });
-    
-    try {
-        const checksummed = ethers.getAddress(address); // ensure checksum
-        const patientId = await contract.patientIds(checksummed);
-        console.log("👤 Resolved Patient ID:", patientId.toString());
 
-        if (patientId.toString() === "0") {
-          toast.error("You must be registered as a patient.");
-          return;
-        }
-      }catch (error) {
-        console.error("Error resolving patient ID:", error);
-        toast.error("Error resolving patient ID");
+ 
+    try {
+         const normalizedAddress = ethers.getAddress(address);
+      const patientId = await contract.patientIdOf(normalizedAddress);
+      console.log("🩺 Patient ID:", patientId.toString());
+
+      if (patientId === 0n || patientId.toString() === "0") {
+        toast.error("❌ You must register as a patient before booking.");
         return;
       }
 
-    
-
-    try {
       const estimatedGas = await contract.bookAppointment.estimateGas(
         doctorAddress, timestamp,
         // feeInEth,

@@ -6,6 +6,7 @@ import NETS from "vanta/src/vanta.net";
 import * as THREE from "three";
 import { Loader2 } from "lucide-react";
 import { ethers } from "ethers";
+import { Link } from "react-router-dom";
 
 const BookAppointment = () => {
   const { allDoctors } = useHealthcare();
@@ -25,21 +26,27 @@ const BookAppointment = () => {
       alert("Please fill in all fields.");
       return;
     }
-  const numericFee = parseFloat(fee);
-    
-  if (isNaN(numericFee) || numericFee <= 0) {
-    alert("Fee must be a positive number.");
-    return;
-  }
-    
-      const timestamp = Math.floor(new Date(appointmentDate).getTime() / 1000); // convert to seconds
-       const feeInWei = ethers.parseEther(numericFee.toFixed(6)); //
+    const numericFee = parseFloat(fee);
+
+    if (isNaN(numericFee) || numericFee <= 0) {
+      alert("Fee must be a positive number.");
+      return;
+    }
+    const now = Math.floor(Date.now() / 1000) + 3600
+    const selectedTime = Math.floor(new Date(appointmentDate).getTime() / 1000);
+    if (selectedTime <= now) {
+      alert("Please select a future date and time.");
+      return;
+    }
+
+    const timestamp = selectedTime;
+    const feeInWei = ethers.parseEther(numericFee.toFixed(6)); //
     try {
 
       setIsLoading(true)
-      await bookAppointment(selectedDoctor, timestamp, feeInWei) ;
+      await bookAppointment(selectedDoctor, timestamp, feeInWei);
 
-      
+
 
       setSelectedDoctor("");
       setAppointmentDate("");
@@ -75,7 +82,7 @@ const BookAppointment = () => {
   }, [vantaEffect]);
 
   return (
-    <div ref={vantaRef} className="w-full min-h-screen flex items-center justify-center px-4 py-8">
+    <div ref={vantaRef} className="w-full min-h-screen flex items-center justify-center  ">
       <form
         onSubmit={handleSubmit}
         className="
@@ -93,10 +100,10 @@ const BookAppointment = () => {
           md:p-10 
           mt-10 
           mb-10
-          relative top-15
+          relative top-10
         "
       >
-        <h1 className="text-2xl sm:text-3xl md:text-1xl font-extrabold text-center mb-8 text-black">
+        <h1 className="text-2xl sm:text-3xl md:text-1xl font-bold text-center mb-8 text-black">
           Book Appointment
         </h1>
 
@@ -107,11 +114,11 @@ const BookAppointment = () => {
             <select
               value={selectedDoctor}
               onChange={(e) => setSelectedDoctor(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 text-sm md:text-base"
+              className="w-full border border-gray-300 rounded-lg p-1 text-sm md:text-base"
               required
               disabled={isLoading}
             >
-              <option value="">Choose</option>
+              <option value="">Choose Doctor</option>
               {allDoctors.map((doctor) => (
                 <option key={doctor.account} value={doctor.account}>
                   {doctor.name} ({doctor.specialization})
@@ -124,7 +131,7 @@ const BookAppointment = () => {
           <div>
             <label className="block text-sm md:text-base font-medium text-gray-700 mb-1">Appointment Date</label>
             <input
-              type="date"
+              type="datetime-local"
               value={appointmentDate}
               onChange={(e) => setAppointmentDate(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3 text-sm md:text-base"
@@ -171,7 +178,13 @@ const BookAppointment = () => {
           ) : (
             "Book Appointment"
           )}
+
         </button>
+        <div>
+          <Link to='/medical'>
+            click here to get daigonis
+          </Link>
+        </div>
       </form>
     </div>
   );

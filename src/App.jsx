@@ -18,15 +18,16 @@ import AllPatients from './pages/AllPatientRecord'
 import SinglePatientRecords from './pages/SinglePatientRecord'
 import DoctorPrescribe from './pages/DoctorPrescribe'
 import PatientPrescriptions from './pages/PatientPrescription'
+import DoctorProfile from './pages/DoctorProfile'
 
 
 const App = () => {
 
   return (
     <div> 
+    
+  {/* <DoctorPrescribe/>/ */}
       <Header/>
-  {/* <DoctorPrescribe/> */}
-      
         <Routes>
          <Route path="/" element={<Home/>} /> 
       
@@ -39,9 +40,10 @@ const App = () => {
          <Route path='/allPatient' element={ <AllPatients />} />
          <Route path='/singlePatient' element={ <SinglePatientRecords />} />
          <Route path='/chat' element={ <Chat/>} /> 
+         <Route path='/doctor-profile' element={ <DoctorProfile/>} /> 
         
          <Route path='/prescribe/:patientId' element={ <DoctorPrescribe/>} />
-         <Route path='/view-prescriptions' element={ <PatientPrescriptions/>} />
+         <Route path='/view-prescription' element={ <PatientPrescriptions/>} />
 
            {/* <Route path='/video' element={ <VideoChat/>} />   */}
 

@@ -33,28 +33,18 @@ const useCreatePrescription = () => {
         toast.error("You're not connected to baseSepolia");
         return;
       }
-      const DOCTOR_ROLE = ethers.keccak256(ethers.toUtf8Bytes("DOCTOR_ROLE"));
-      const isDoctor = await contract.hasRole(DOCTOR_ROLE, address);
-
-      if (!isDoctor) {
-        toast.error("You must be connected as a doctor to prescribe medicine.");
-        return;
-      }
-
-
-      //  try {
-      //   const isDoctor = await contract.doctorIds(address);
-      //   if (!isDoctor) {
-      //     toast.error("Only doctors can prescribe medicine");
-      //     return;
-      //   }
-      // } catch (err) {
-      //   console.error("Error checking doctor role", err);
-      //   toast.error("Error checking doctor access");
-      //   return;
-      // }
-
+      
+      
+      
+      
       try {
+        const DOCTOR_ROLE = ethers.keccak256(ethers.toUtf8Bytes("DOCTOR_ROLE"));
+        const isDoctor = await contract.hasRole(DOCTOR_ROLE, address);
+  
+        if (!isDoctor) {
+          toast.error("You must be connected as a doctor to prescribe medicine.");
+          return;
+        }
         const estimatedGas = await contract.prescribeMedicine.estimateGas(recordId, prescription);
 
         const tx = await contract.prescribeMedicine(recordId, prescription, {
@@ -74,6 +64,7 @@ const useCreatePrescription = () => {
         const decodeError = await errorDecoder.decode(error);
         console.error("Error adding prescription", error);
         toast.error(decodeError.reason || "Unknown error");
+        console.log(`${decodeError.reason}`);
       }
     },
     [contract, address, chainId]

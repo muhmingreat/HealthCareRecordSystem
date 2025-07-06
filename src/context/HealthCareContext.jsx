@@ -3,7 +3,7 @@ import useContractInstance from "../hooks/useContractInstance";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { toast } from "react-toastify";
 import { isAddress } from "ethers"
-
+import { ethers } from "ethers";
 
 const HealthCareContext = createContext();
 
@@ -32,6 +32,8 @@ export const HealthCareProvider = ({ children }) => {
         specialization: doc.specialization,
         licenseId: doc.licenseId,
         account: doc.account,
+        biography: doc.biography,
+        avatar:doc.avatar,
         isDeleted: doc.isDeleted,
       }));
       setAllDoctors(formatted);
@@ -73,6 +75,35 @@ const getPatientMedicalRecords = useCallback(async (patientId, viewerAddress = a
   }
 }, [contract, address]);
 
+//  useEffect(() => {
+//   if (!contract) return;
+
+//   const listener = (...args) => {
+//     console.log("Event fired:", args);
+//   };
+
+//   contract.on("MedicalRecordAdded", listener);
+
+//   return () => {
+//     contract.off("MedicalRecordAdded", listener);
+//   };
+// }, [contract]);
+// useEffect(() => {
+//   if (!contract?.filters?.NewMedicalRecord) {
+//     console.warn("Event not found in ABI");
+//     return;
+//   }
+
+//   const listener = (patientId, ipfsHash) => {
+//     console.log("New medical record:", patientId, ipfsHash);
+//   };
+
+//   contract.on("AddMedicalRecord", listener);
+
+//   return () => {
+//     contract.off("AddMedicalRecord", listener);
+//   };
+// }, [contract]);
 
 
 useEffect(() => {
@@ -192,6 +223,117 @@ const getAllPatients = useCallback(async () => {
     getAllPatients();
   }, []);
 
+  //   const [alertCount, setAlertCount] = useState(0);
+
+  // useEffect(() => {
+  //   if (!contract || !address) return;
+
+  //   const me = ethers.getAddress(address);
+
+  //   const handleMedicalRecord = (recordId, patientId, doctorAddr /*, diagnosis */) => {
+  //     if (doctorAddr.toLowerCase() === me.toLowerCase()) {
+  //       setAlertCount((c) => c + 1);
+  //       toast.info(`🩺 New medical record from patient #${patientId}`);
+  //          console.log("📢 MedicalRecordAdded event fired", {
+  //     recordId,
+  //     patientId,
+  //     doctorAddr,
+  //     me
+  //   });
+  //     }
+  //   };
+    
+  //   console.log("✅ Listener bound to contract:", contract?.address);
+   
+
+  //   const handlePrescription = async (recordId /*, prescription */) => {
+  //     try {
+  //       const rec = await contract.records(recordId);
+  //       const myId = await contract.patientIdOf(me);
+  //       if (Number(rec.patientId) === Number(myId)) {
+  //         setAlertCount((c) => c + 1);
+  //         toast.success(`💊 New prescription for record #${recordId}`);
+       
+  //       console.log("📢 PrescriptionAdded event fired", { recordId, prescription });
+  //       }
+  //     } catch (err) {
+  //       console.error("❌ Prescription event error:", err);
+  //     }
+  //   };
+
+  //   contract.on("MedicalRecordAdded", handleMedicalRecord);
+  //   contract.on("PrescriptionAdded", handlePrescription);
+
+  //   return () => {
+  //     contract.off("MedicalRecordAdded", handleMedicalRecord);
+  //     contract.off("PrescriptionAdded", handlePrescription);
+  //   };
+  // }, [contract, address]);
+
+  // /* 🔹 helper to reset alerts after user reads them */
+  // const resetAlerts = () => setAlertCount(0);
+  const [alertCount, setAlertCount] = useState(0);
+
+useEffect(() => {
+  if (!contract || !address) return;
+
+  const me = ethers.getAddress(address); // Normalize user address
+
+  const handleMedicalRecord = (recordId, patientId, doctorAddr) => {
+    if (doctorAddr.toLowerCase() === me.toLowerCase()) {
+      setAlertCount((prev) => prev + 1);
+      toast.info(`🩺 New medical record from patient #${patientId}`);
+      console.log("📢 MedicalRecordAdded event fired", {
+        recordId,
+        patientId,
+        doctorAddr,
+        me,
+      });
+    }
+  };
+
+  const handlePrescription = async (recordId) => {
+    try {
+      const rec = await contract.records(recordId);
+      const myId = await contract.patientIdOf(me);
+
+      if (Number(rec.patientId) === Number(myId)) {
+        setAlertCount((prev) => prev + 1);
+        toast.success(`💊 New prescription for record #${recordId}`);
+        console.log("📢 PrescriptionAdded event fired", { recordId });
+      }
+    } catch (err) {
+      console.error("❌ Prescription event error:", err);
+    }
+  };
+
+  // Optional: log contract and validate event availability
+
+  const boundAddress = contract?.target ?? contract?.address;
+if (!boundAddress) {
+  console.warn("❌ Contract not properly initialized. Check env or ABI.");
+  return;
+}
+
+console.log("✅ Listener bound to contract:", boundAddress);
+
+  if (contract.filters?.MedicalRecordAdded && contract.filters?.PrescriptionAdded) {
+    contract.on("MedicalRecordAdded", handleMedicalRecord);
+    contract.on("PrescriptionAdded", handlePrescription);
+  } else {
+    console.warn("⚠️ Event(s) not found in ABI. Check if ABI is updated.");
+  }
+
+  return () => {
+    contract.off("MedicalRecordAdded", handleMedicalRecord);
+    contract.off("PrescriptionAdded", handlePrescription);
+  };
+}, [contract, address]);
+
+// Reset alert count when user interacts
+const resetAlerts = () => setAlertCount(0);
+
+
   return (
     <HealthCareContext.Provider value={{
       appName,
@@ -206,7 +348,8 @@ const getAllPatients = useCallback(async () => {
       getAllPatients,
       getMyPatientProfile,
       fetchSinglePatient,
- 
+      resetAlerts,
+      alertCount
     }}>
       {children}
     </HealthCareContext.Provider>

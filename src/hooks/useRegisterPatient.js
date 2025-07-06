@@ -16,8 +16,8 @@ const useCreatePatient = () => {
   const { chainId } = useAppKitNetwork();
 
   return useCallback(
-    async (name, age, gender ) => {
-      if (!name || !age || !gender) {
+    async (name, age, gender, avatar) => {
+      if (!name || !age || !gender || !avatar) {
         toast.error("All fields are required");
         return;
       }
@@ -33,25 +33,30 @@ const useCreatePatient = () => {
       }
 
       if (Number(chainId) !== Number(celoAlfajores.id)) {
-        toast.error("You're not connected to baseSepolia");
+        toast.error("You're not connected to celoAfajores");
         return;
       }
 
       try {
         const estimatedGas = await contract.registerPatient.estimateGas(
-         name, Number(age), gender
+          name, Number(age), gender, avatar
         );
-        const tx = await contract.registerPatient(name, Number(age), gender, {
+        const tx = await contract.registerPatient(name, Number(age), gender,avatar, {
           gasLimit: (estimatedGas * BigInt(120)) / BigInt(100),
         });
-        // toast.info("Registering patient...");
+
 
         const receipt = await tx.wait();
 
         if (receipt.status === 1) {
-          toast.success("Patient registered successfully");
-          return true;
-        }
+        //   const patientId = await contract.addressToPatientId(address);
+        //   if (patientId === 0n || patientId.toString() === "0") {
+        //     toast.error(" Registration failed. Please try again.");
+        //     return;
+        //   }
+        toast.success(`Patient${name} registered successfully`);
+        return true;
+      }
 
         toast.error("Failed to register patient");
         return false;

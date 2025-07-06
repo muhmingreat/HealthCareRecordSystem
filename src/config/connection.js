@@ -1,11 +1,10 @@
 import { createAppKit } from '@reown/appkit/react';
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
-// ❌ AppKit networks doesn’t include Celo directly, so we define manually
 
-// 1️⃣ Get projectId from env
+
 const projectId = import.meta.env.VITE_APPKIT_PROJECT_ID;
 
-// 2️⃣ Define Celo networks manually (since @reown/appkit/networks doesn't include them)
+
 const alfajores = {
   id: 44787,
   name: 'Celo Alfajores',
@@ -52,58 +51,38 @@ const celo = {
   testnet: false,
 };
 
-// 3️⃣ Set the networks array
+
 const networks = [alfajores, celo];
 
-// 4️⃣ Create metadata (optional)
 const metadata = {
   name: 'My Healthcare DApp',
   description: 'Healthcare Record System on CELO',
-  url: 'http://localhost:5173',  // replace with your real domain
-  icons: ['https://myhealthcareapp.com/icon.png']  // your app icon url
+  url: 'http://localhost:5173', 
+  icons: ['https://myhealthcareapp.com/icon.png'] ,
+
+
 };
 
-// 5️⃣ Create AppKit instance
+
 createAppKit({
   adapters: [new EthersAdapter()],
   networks,
   metadata,
   projectId,
   features: {
-    analytics: true // Optional - enable analytics
-  }
+    analytics: true 
+  },
+  themeVariables: {
+    "--w3m-accent": "black",
+    "--w3m-border-radius-master": "1px",
+  },
+  themeMode: "dark",
+  themeVariables: {
+
+        "--w3m-accent": "black",
+    
+        "--w3m-border-radius-master": "1px",
+    
+      },
 });
 
-
-
-// import { createAppKit } from '@reown/appkit/react'
-// import { EthersAdapter } from '@reown/appkit-adapter-ethers'
-// import { baseSepolia, sepolia } from '@reown/appkit/networks'
-// // import { baseSepolia, sepolia } from '@reown/appkit/networks'
-// // import { alfajores, celo } from '@reown/appkit/networks'
-
-// // 1. Get projectId
-// const projectId = import.meta.env.VITE_APPKIT_PROJECT_ID
-
-// // 2. Set the networks
-// const networks = [baseSepolia, sepolia]
-// // const networks = [alfajores, celo]
-
-// // 3. Create a metadata object - optional
-// const metadata = {
-//   name: 'My Website',
-//   description: 'My Website description',
-//   url: 'https://mywebsite.com', // origin must match your domain & subdomain
-//   icons: ['https://avatars.mywebsite.com/']
-// }
-
-// // 4. Create a AppKit instance
-// createAppKit({
-//   adapters: [new EthersAdapter()],
-//   networks,
-//   metadata,
-//   projectId,
-//   features: {
-//     analytics: true // Optional - defaults to your Cloud configuration
-//   }
-// })
