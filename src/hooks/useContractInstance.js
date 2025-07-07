@@ -1,9 +1,6 @@
-
-
-
-
 import React, { useMemo } from "react";
 import useSignerOrProvider from "./useSignerOrProvider";
+// import useSignerOrProvider from "./useSignerOrProvider";
 import { Contract } from "ethers";
 import ABI from "../ABI/Healthcare.json"
 
@@ -19,9 +16,7 @@ const useContractInstance = (withSigner = false) => {
         signer
       );
     }
-    // console.log("📄 VITE_CONTRACT_ADDRESS:", import.meta.env.VITE_CONTRACT_ADDRESS);
-    // console.log("🧾 Signer:", signer);
-    // console.log("📡 Provider:", readOnlyProvider);
+   
 
     return new Contract(
       import.meta.env.VITE_CONTRACT_ADDRESS,
