@@ -8,6 +8,7 @@ import { ethers } from "ethers";
 const HealthCareContext = createContext();
 
 export const HealthCareProvider = ({ children }) => {
+
   const appName = "Healthcare System";
 
   const [healthcare, setHealthcare] = useState([]);
@@ -16,6 +17,9 @@ export const HealthCareProvider = ({ children }) => {
   const [loggedInPatient, setLoggedInPatient] = useState(null);
   const [allDoctors, setAllDoctors] = useState([]);
   const [patientRecords, setPatientRecords] = useState([]);
+  const [doctorProfile, setDoctorProfile] = useState();
+  const [doctorAssignedRecords, setDoctorAssignedRecords] = useState([]);
+
   
 
   const { address } = useAppKitAccount();
@@ -74,36 +78,6 @@ const getPatientMedicalRecords = useCallback(async (patientId, viewerAddress = a
     setPatientRecords([]);
   }
 }, [contract, address]);
-
-//  useEffect(() => {
-//   if (!contract) return;
-
-//   const listener = (...args) => {
-//     console.log("Event fired:", args);
-//   };
-
-//   contract.on("MedicalRecordAdded", listener);
-
-//   return () => {
-//     contract.off("MedicalRecordAdded", listener);
-//   };
-// }, [contract]);
-// useEffect(() => {
-//   if (!contract?.filters?.NewMedicalRecord) {
-//     console.warn("Event not found in ABI");
-//     return;
-//   }
-
-//   const listener = (patientId, ipfsHash) => {
-//     console.log("New medical record:", patientId, ipfsHash);
-//   };
-
-//   contract.on("AddMedicalRecord", listener);
-
-//   return () => {
-//     contract.off("AddMedicalRecord", listener);
-//   };
-// }, [contract]);
 
 
 useEffect(() => {
@@ -223,117 +197,63 @@ const getAllPatients = useCallback(async () => {
     getAllPatients();
   }, []);
 
-  //   const [alertCount, setAlertCount] = useState(0);
 
-  // useEffect(() => {
-  //   if (!contract || !address) return;
-
-  //   const me = ethers.getAddress(address);
-
-  //   const handleMedicalRecord = (recordId, patientId, doctorAddr /*, diagnosis */) => {
-  //     if (doctorAddr.toLowerCase() === me.toLowerCase()) {
-  //       setAlertCount((c) => c + 1);
-  //       toast.info(`🩺 New medical record from patient #${patientId}`);
-  //          console.log("📢 MedicalRecordAdded event fired", {
-  //     recordId,
-  //     patientId,
-  //     doctorAddr,
-  //     me
-  //   });
-  //     }
-  //   };
-    
-  //   console.log("✅ Listener bound to contract:", contract?.address);
-   
-
-  //   const handlePrescription = async (recordId /*, prescription */) => {
-  //     try {
-  //       const rec = await contract.records(recordId);
-  //       const myId = await contract.patientIdOf(me);
-  //       if (Number(rec.patientId) === Number(myId)) {
-  //         setAlertCount((c) => c + 1);
-  //         toast.success(`💊 New prescription for record #${recordId}`);
-       
-  //       console.log("📢 PrescriptionAdded event fired", { recordId, prescription });
-  //       }
-  //     } catch (err) {
-  //       console.error("❌ Prescription event error:", err);
-  //     }
-  //   };
-
-  //   contract.on("MedicalRecordAdded", handleMedicalRecord);
-  //   contract.on("PrescriptionAdded", handlePrescription);
-
-  //   return () => {
-  //     contract.off("MedicalRecordAdded", handleMedicalRecord);
-  //     contract.off("PrescriptionAdded", handlePrescription);
-  //   };
-  // }, [contract, address]);
-
-  // /* 🔹 helper to reset alerts after user reads them */
-  // const resetAlerts = () => setAlertCount(0);
-  const [alertCount, setAlertCount] = useState(0);
-
-useEffect(() => {
-  if (!contract || !address) return;
-
-  const me = ethers.getAddress(address); // Normalize user address
-
-  const handleMedicalRecord = (recordId, patientId, doctorAddr) => {
-    if (doctorAddr.toLowerCase() === me.toLowerCase()) {
-      setAlertCount((prev) => prev + 1);
-      toast.info(`🩺 New medical record from patient #${patientId}`);
-      console.log("📢 MedicalRecordAdded event fired", {
-        recordId,
-        patientId,
-        doctorAddr,
-        me,
-      });
+const fetchDoctorProfile = useCallback(async () => { 
+if(!address   || !contract) return;
+  try {
+    const doctor = await contract.getMyDoctorProfile();
+    if (!doctor || doctor.isDeleted) {
+      toast.error("You are not registered as a doctor");
+      return;
     }
-  };
-
-  const handlePrescription = async (recordId) => {
-    try {
-      const rec = await contract.records(recordId);
-      const myId = await contract.patientIdOf(me);
-
-      if (Number(rec.patientId) === Number(myId)) {
-        setAlertCount((prev) => prev + 1);
-        toast.success(`💊 New prescription for record #${recordId}`);
-        console.log("📢 PrescriptionAdded event fired", { recordId });
-      }
-    } catch (err) {
-      console.error("❌ Prescription event error:", err);
-    }
-  };
-
-  // Optional: log contract and validate event availability
-
-  const boundAddress = contract?.target ?? contract?.address;
-if (!boundAddress) {
-  console.warn("❌ Contract not properly initialized. Check env or ABI.");
-  return;
-}
-
-console.log("✅ Listener bound to contract:", boundAddress);
-
-  if (contract.filters?.MedicalRecordAdded && contract.filters?.PrescriptionAdded) {
-    contract.on("MedicalRecordAdded", handleMedicalRecord);
-    contract.on("PrescriptionAdded", handlePrescription);
-  } else {
-    console.warn("⚠️ Event(s) not found in ABI. Check if ABI is updated.");
+    const formatted = {
+      id: Number(doctor.id),
+      name: doctor.name,
+      specialization: doctor.specialization,
+      licenseId: doctor.licenseId,
+      biography: doctor.biography,
+      avatar: doctor.avatar,
+      account: doctor.account,
+      isDeleted: doctor.isDeleted,
+    };
+    setDoctorProfile(formatted);
+  } catch (err) {
+    console.error("Error fetching doctor profile", err);
+    toast.error("Failed to fetch your doctor profile");
   }
 
-  return () => {
-    contract.off("MedicalRecordAdded", handleMedicalRecord);
-    contract.off("PrescriptionAdded", handlePrescription);
-  };
-}, [contract, address]);
+},[])
+useEffect(() => {
+  fetchDoctorProfile();
+}, [fetchDoctorProfile]);
 
-// Reset alert count when user interacts
-const resetAlerts = () => setAlertCount(0);
+const getMyAssignedMedicalRecords = useCallback(async () => {
+  if (!contract || !doctorProfile?.id) return;
 
+  try {
+    const records = await contract.getMedicalRecordsByDoctor(doctorProfile.id);
+    const formatted = records.map((rec) => ({
+      id: Number(rec.id),
+      patientId: Number(rec.patientId),
+      doctorId: Number(rec.doctorId),
+      ipfsUrl: rec.ipfsUrl,
+      patientName: rec.patientName,
+      diagnosis: rec.diagnosis,
+      prescription: rec.prescription,
+      timestamp: Number(rec.timestamp),
+      isDeleted: rec.isDeleted,
+    }));
+    setDoctorAssignedRecords(formatted); 
+  } catch (err) {
+    console.error("Failed to fetch doctor-assigned records", err);
+    toast.error("Could not fetch assigned patient prescriptions.");
+  }
+}, [contract, doctorProfile]);
 
+// useEffect(() => {
+
+//     getMyAssignedMedicalRecords();
+//   }, [ getMyAssignedMedicalRecords]);
   return (
     <HealthCareContext.Provider value={{
       appName,
@@ -344,12 +264,13 @@ const resetAlerts = () => setAlertCount(0);
       selectedPatient,
       loggedInPatient,
       address,
+      doctorProfile,
+      doctorAssignedRecords,
       getPatientMedicalRecords,
       getAllPatients,
       getMyPatientProfile,
       fetchSinglePatient,
-      resetAlerts,
-      alertCount
+      getMyAssignedMedicalRecords
     }}>
       {children}
     </HealthCareContext.Provider>

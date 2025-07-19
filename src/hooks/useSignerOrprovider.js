@@ -1,27 +1,57 @@
 import { useAppKitProvider } from "@reown/appkit/react";
 import { BrowserProvider } from "ethers";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { readOnlyProvider } from "../constant/readOnlyProvider";
 
 const useSignerOrProvider = () => {
-  const [signer, setSigner] = useState();
-
+  const [signer, setSigner] = useState(null);
   const { walletProvider } = useAppKitProvider("eip155");
 
-  const provider = useMemo(
-    () => (walletProvider ? new BrowserProvider(walletProvider) : null),
-    [walletProvider]
-  );
+  const providerRef = useRef(null);
+
+  
+  const provider = useMemo(() => {
+    if (!walletProvider) return null;
+
+    
+    if (!providerRef.current || providerRef.current.connection !== walletProvider) {
+      providerRef.current = new BrowserProvider(walletProvider);
+    }
+
+    return providerRef.current;
+  }, [walletProvider]);
 
   useEffect(() => {
-    if (!provider) return setSigner(null);
+    let cancelled = false;
 
-    provider.getSigner().then((newSigner) => {
-      if (!signer) return setSigner(newSigner);
-      if (newSigner.address === signer.address) return;
-       setSigner(newSigner);
-    });
-  }, [provider, signer]);
+    const getSigner = async () => {
+      if (!provider) {
+        setSigner(null);
+        return;
+      }
+
+      try {
+        const newSigner = await provider.getSigner();
+        if (!cancelled) {
+          setSigner((prev) => {
+            if (!prev || prev.address !== newSigner.address) {
+              return newSigner;
+            }
+            return prev;
+          });
+        }
+      } catch (e) {
+        console.error("Failed to get signer", e);
+        if (!cancelled) setSigner(null);
+      }
+    };
+
+    getSigner();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [provider]);
 
   return { signer, provider, readOnlyProvider };
 };

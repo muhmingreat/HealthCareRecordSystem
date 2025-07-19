@@ -30,7 +30,7 @@ const RegisterPatient = () => {
   };
 })();
   // Vanta Background Setup
-  console.log("✅ Listener bound to contract:", contract?.address);
+  // console.log("✅ Listener bound to contract:", contract?.address);
 
   useEffect(() => {
     if (!vantaEffect) {

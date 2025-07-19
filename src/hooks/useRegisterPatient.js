@@ -49,11 +49,7 @@ const useCreatePatient = () => {
         const receipt = await tx.wait();
 
         if (receipt.status === 1) {
-        //   const patientId = await contract.addressToPatientId(address);
-        //   if (patientId === 0n || patientId.toString() === "0") {
-        //     toast.error(" Registration failed. Please try again.");
-        //     return;
-        //   }
+     
         toast.success(`Patient${name} registered successfully`);
         return true;
       }

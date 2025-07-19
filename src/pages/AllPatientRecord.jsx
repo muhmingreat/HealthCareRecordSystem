@@ -53,7 +53,7 @@ const AllPatients = () => {
     try {
       await handleDeletePatient(id);
       toast.success(`Patient with ID ${id} deleted.`);
-      getAllPatients(); // Refresh list
+      getAllPatients(); 
     } catch (error) {
       console.error("Delete error:", error);
       toast.error("Failed to delete patient");

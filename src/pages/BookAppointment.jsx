@@ -34,7 +34,7 @@ const BookAppointment = () => {
     }
     const now = Math.floor(Date.now() / 1000) + 3600
     const selectedTime = Math.floor(new Date(appointmentDate).getTime() / 1000);
-    if (selectedTime <= now) {
+    if (selectedTime < now) {
       alert("Please select a future date and time.");
       return;
     }

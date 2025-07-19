@@ -46,17 +46,17 @@ return useCallback(async (doctorAddress, timestamp, fee) => {
  
     try {
          const normalizedAddress = ethers.getAddress(address);
-      const patientId = await contract.patientIdOf(normalizedAddress);
+      const patientId = await contract.addressToPatientId(normalizedAddress);
       console.log("🩺 Patient ID:", patientId.toString());
 
       if (patientId === 0n || patientId.toString() === "0") {
-        toast.error("❌ You must register as a patient before booking.");
+        toast.error(" You must register as a patient before booking.");
         return;
       }
 
       const estimatedGas = await contract.bookAppointment.estimateGas(
         doctorAddress, timestamp,
-        // feeInEth,
+        
         { value: fee }
       );
 
@@ -67,7 +67,7 @@ return useCallback(async (doctorAddress, timestamp, fee) => {
 
         {
           gasLimit: (estimatedGas * BigInt(120)) / BigInt(100),
-          value: fee // 20% buffer
+          value: fee 
         }
       );
 

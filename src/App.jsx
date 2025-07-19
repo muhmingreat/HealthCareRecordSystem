@@ -14,10 +14,10 @@ import Chat from './component/Chat'
 import BookAppointment from './pages/BookAppointment'
 import GetAllDoctors from './pages/GetAllDoctors'
 import AllPatients from './pages/AllPatientRecord'
-import SinglePatientRecords from './pages/SinglePatientRecord'
-import DoctorPrescribe from './pages/DoctorPrescribe'
 import PatientPrescriptions from './pages/PatientPrescription'
-import DoctorProfile from './pages/DoctorProfile'
+import DoctorDashboard from './pages/DoctorDashbord'
+import PatientDashboard from './pages/PatientDashboard'
+import VideoChat from './pages/VideoChat'
 
 
 const App = () => {
@@ -37,14 +37,15 @@ const App = () => {
          <Route path='/booking' element={ <BookAppointment/>} />
          <Route path='/doctor-list' element={ <GetAllDoctors />} />
          <Route path='/allPatient' element={ <AllPatients />} />
-         <Route path='/singlePatient' element={ <SinglePatientRecords />} />
-         <Route path='/chat' element={ <Chat/>} /> 
-         <Route path='/doctor-profile' element={ <DoctorProfile/>} /> 
         
-         <Route path='/prescribe/:patientId' element={ <DoctorPrescribe/>} />
-         <Route path='/view-prescription' element={ <PatientPrescriptions/>} />
+         <Route path='/chat' element={ <Chat/>} /> 
+      
+         <Route path='/doctor-dashboard' element={ <DoctorDashboard/>} /> 
 
-           {/* <Route path='/video' element={ <VideoChat/>} />   */}
+        
+         <Route path='/patient-view' element={ <PatientDashboard/>} />
+
+           <Route path='/video' element={ <VideoChat/>} />  
 
          
       

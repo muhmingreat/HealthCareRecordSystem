@@ -7,7 +7,7 @@ import useRegisterDoctor from '../hooks/useRegisterDoctor';
 import { Link } from 'react-router-dom';
 
 const RegisterDoctor = () => {
-  /* ----------  Vanta  ---------- */
+
   const vantaRef = useRef(null);
   const [vantaEffect, setVantaEffect] = useState(null);
   useEffect(() => {
@@ -27,7 +27,7 @@ const RegisterDoctor = () => {
     return () => vantaEffect && vantaEffect.destroy();
   }, [vantaEffect]);
 
-  /* ----------  Form state  ---------- */
+  
   const [fields, setFields] = useState({
     name: '',
     specialisation: '',
@@ -46,7 +46,7 @@ const RegisterDoctor = () => {
     setPreviewURL(URL.createObjectURL(file));
   };
 
-  /* ----------  Pinata upload helper  ---------- */
+  
   const uploadToIPFS = async (file) => {
     const form = new FormData();
     form.append('file', file);
@@ -66,7 +66,7 @@ const RegisterDoctor = () => {
 
   const handleRegisterDoctor = useRegisterDoctor();
 
-  /* ----------  Submit  ---------- */
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (biography.length > 200) {
@@ -77,7 +77,7 @@ const RegisterDoctor = () => {
     try {
       const ipfsUrl = avatar ? await uploadToIPFS(avatar) : '';
 
-      await handleRegisterDoctor(name, specialisation, license, biography, ipfsUrl);
+      await handleRegisterDoctor(name, specialisation, license,ipfsUrl,  biography, );
       setFields({ name: '', specialisation: '', license: '', biography: '', avatar: null });
       setPreviewURL('');
     } catch (err) {
@@ -87,12 +87,12 @@ const RegisterDoctor = () => {
     }
   };
 
-  /* ----------  JSX  ---------- */
+  
   return (
     <div ref={vantaRef} className="w-full min-h-screen flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className=" w-full max-w-md mx-4 p-8 rounded-3xl shadow-xl 
+        className=" w-full max-w-md mx-4 p-8 rounded-3xl shadow-xl  relative top-20
                    bg-gradient-to-tr from-orange-600 via-blue-900 to-black bg-[length:200%_200%] 
                    animate-[gradient_10s_ease_infinite]"
       >
@@ -125,7 +125,7 @@ const RegisterDoctor = () => {
           value={license}
           onChange={(e) => handleChange(e, 'license')}
           className="mb-4 w-full rounded-md p-3 bg-gradient-to-r from-black to-orange-700
-                     text-gray-300 bg-black focus:outline-none focus:ring-2 focus:ring-orange-400"
+                     text-white bg-black focus:outline-none focus:ring-2 focus:ring-orange-400"
           required
         >
           <option value="" disabled>Select license type</option>
@@ -137,7 +137,7 @@ const RegisterDoctor = () => {
           ))}
         </select>
 
-        {/* Biography */}
+      
         <textarea
           value={biography}
           placeholder="Biography (max 200 chars)"
@@ -148,12 +148,12 @@ const RegisterDoctor = () => {
           required
         />
 
-        {/* Avatar upload */}
+    
         <div className="mb-6 flex items-center gap-4">
           <label className="text-white">Avatar:</label>
           <input
             type="file"
-            accept="image/*"
+            accept="image/* pdf"
             onChange={(e) => handleAvatar(e.target.files[0])}
             className="text-sm text-white"
             
@@ -164,7 +164,7 @@ const RegisterDoctor = () => {
           )}
         </div>
 
-        {/* Submit */}
+        
         <button
           type="submit"
           disabled={loading}
@@ -180,12 +180,13 @@ const RegisterDoctor = () => {
             'Register Doctor'
           )}
         </button>
-        <Link to='/'>
+        <Link to='/' className='test-white text-center block mt-4 hover:underline'>
         Back Home</Link>
       </form>
     </div>
   );
 };
+
 
 export default RegisterDoctor;
 

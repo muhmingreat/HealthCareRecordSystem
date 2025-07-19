@@ -33,21 +33,23 @@ const useMedicalRecord = () => {
       }
       
       try {
-        const patientId = await contract.patientIdOf(address);
+        const patientId = await contract.addressToPatientId(address);
         if(patientId === 0n){
-          // toast.error("You are not registered as a patient");
+    
           console.log("You are not registered as a patient")
           return;
         }
+        
 
         const estimatedGas = await contract.addMedicalRecord.estimateGas(
           patientId,
+        
           ipfsUrl,
           patientName,
           diagnosis
         );
 
-        const tx = await contract.addMedicalRecord(patientId, ipfsUrl, patientName, diagnosis, {
+        const tx = await contract.addMedicalRecord(patientId,  ipfsUrl, patientName, diagnosis, {
           gasLimit: (estimatedGas * BigInt(120)) / BigInt(100),
         });
 
