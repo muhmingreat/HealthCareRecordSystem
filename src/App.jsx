@@ -17,7 +17,7 @@ import AllPatients from './pages/AllPatientRecord'
 import PatientPrescriptions from './pages/PatientPrescription'
 import DoctorDashboard from './pages/DoctorDashbord'
 import PatientDashboard from './pages/PatientDashboard'
-import VideoChat from './pages/VideoChat'
+
 
 
 const App = () => {
@@ -25,7 +25,7 @@ const App = () => {
   return (
     <div> 
     
-  {/* <DoctorPrescribe/>/ */}
+
       <Header/>
         <Routes>
          <Route path="/" element={<Home/>} /> 
@@ -45,7 +45,6 @@ const App = () => {
         
          <Route path='/patient-view' element={ <PatientDashboard/>} />
 
-           <Route path='/video' element={ <VideoChat/>} />  
 
          
       

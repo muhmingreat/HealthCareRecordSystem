@@ -99,14 +99,14 @@ const contract = useContractInstance();
   setLoading(true);
 
   try {
-    // 1. Add the medical record to the contract
+    
     await handleMedicalRecord(ipfsUrl, patientName, diagnosis);
-    //  const patientId = await contract.patientIdOf(address);
+    
     setIpfsUrl('');
     setPatientName('');
     setDiagnosis('');
     setSelectedFile(null);
-    // navigate(`/prescribe/${patientId}`);
+  
   } catch (err) {
     console.error(" Error during medical record submission:", err);
   
