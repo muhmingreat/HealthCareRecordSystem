@@ -72,9 +72,12 @@ const DoctorDashboard = () => {
           <div className="bg-white/70 backdrop-blur-md shadow-lg rounded-2xl p-6 w-full lg:w-1/3">
            
             <p className="mb-2">
+              <span className="font-semibold">Name:</span> {doctorProfile.name}
+            </p>
+            <p className="mb-2">
               <span className="font-semibold">Specialization:</span> {doctorProfile.specialization}
             </p>
-            <p>
+            <p className="mb-2">
               <span className="font-semibold">Biography:</span> {doctorProfile.biography}
             </p>
           <img src={doctorProfile.avatar} alt={doctorProfile.id} />

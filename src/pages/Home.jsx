@@ -36,7 +36,7 @@ const Home = () => {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.5, duration: 1 }}
               >
-                Welcome to HealthChain
+                Welcome to Healthcare Record
               </motion.h1>
 
               <motion.h2
@@ -54,8 +54,8 @@ const Home = () => {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.9, duration: 1 }}
               >
-                HealthChain puts your medical records where they belong — in your hands. Using blockchain & IPFS,
-                we provide tamper-proof, secure, and accessible health data for both patients and doctors.
+                Healthcare record puts your medical records where they belong  in your hands<br/> Using blockchain & IPFS,
+                we provide tamper proof, secure, and accessible health data for both patients and doctors.
               </motion.p>
 
               <div className="bg-white/10 p-4 rounded-xl mt-2 backdrop-blur-sm">
@@ -79,7 +79,7 @@ const Home = () => {
                 </button>
 
                 <Link to="/medical">
-                  <button className="bg-green-700 hover:bg-green-900 text-white font-semibold py-3 px-6 rounded-full transition">
+                  <button className="bg-green-800 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-full transition">
                     Get Diagnosis
                   </button>
                 </Link>
